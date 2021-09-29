@@ -26,6 +26,8 @@
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>LICENSE</itemPath>
+    <itemPath>README.md</itemPath>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -50,6 +52,10 @@
           <warningLevel>2</warningLevel>
         </asmTool>
       </compileType>
+      <item path="LICENSE" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="README.md" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/libconfigfile.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/libconfigfile.h" ex="false" tool="3" flavor2="0">
@@ -75,6 +81,10 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="LICENSE" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="README.md" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/libconfigfile.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/libconfigfile.h" ex="false" tool="3" flavor2="0">
@@ -103,6 +113,10 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="LICENSE" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="README.md" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/libconfigfile.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/libconfigfile.h" ex="false" tool="3" flavor2="0">
@@ -130,6 +144,10 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="LICENSE" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="README.md" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/libconfigfile.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/libconfigfile.h" ex="false" tool="3" flavor2="0">
