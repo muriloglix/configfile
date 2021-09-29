@@ -14,6 +14,7 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>src/libconfigfile.c</itemPath>
+      <itemPath>Examples/001/main.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -27,7 +28,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
     <itemPath>LICENSE</itemPath>
+    <itemPath>Examples/001/Makefile</itemPath>
     <itemPath>README.md</itemPath>
+    <itemPath>Examples/001/test.conf</itemPath>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -52,6 +55,10 @@
           <warningLevel>2</warningLevel>
         </asmTool>
       </compileType>
+      <item path="Examples/001/Makefile" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Examples/001/test.conf" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="LICENSE" ex="false" tool="3" flavor2="0">
       </item>
       <item path="README.md" ex="false" tool="3" flavor2="0">
@@ -81,6 +88,10 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="Examples/001/Makefile" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Examples/001/test.conf" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="LICENSE" ex="false" tool="3" flavor2="0">
       </item>
       <item path="README.md" ex="false" tool="3" flavor2="0">
@@ -113,6 +124,10 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="Examples/001/Makefile" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Examples/001/test.conf" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="LICENSE" ex="false" tool="3" flavor2="0">
       </item>
       <item path="README.md" ex="false" tool="3" flavor2="0">
@@ -144,6 +159,20 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="Examples/001/Makefile" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Examples/001/main.c" ex="true" tool="0" flavor2="9">
+        <cTool>
+          <stripSymbols>false</stripSymbols>
+          <incDir>
+            <pElem>src</pElem>
+          </incDir>
+          <inheritIncValues>false</inheritIncValues>
+          <warningLevel>1</warningLevel>
+        </cTool>
+      </item>
+      <item path="Examples/001/test.conf" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="LICENSE" ex="false" tool="3" flavor2="0">
       </item>
       <item path="README.md" ex="false" tool="3" flavor2="0">
