@@ -7,8 +7,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/murilo/C%20Projects/github/configfile/LICENSE</file>
+            <file>file:/home/murilo/C%20Projects/github/configfile/README.md</file>
             <file>file:/home/murilo/C%20Projects/github/configfile/src/libconfigfile.c</file>
+            <file>file:/home/murilo/C%20Projects/github/configfile/Examples/001/Makefile</file>
+            <file>file:/home/murilo/C%20Projects/github/configfile/Examples/001/test.conf</file>
+            <file>file:/home/murilo/C%20Projects/github/configfile/Examples/001/main.c</file>
         </group>
     </open-files>
 </project-private>
