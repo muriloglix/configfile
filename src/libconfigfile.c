@@ -199,6 +199,7 @@ repeat_delimiter:
                 goto repeat_delimiter;
             }
 
+            delimiter[0] = ' ';
             module_value = &module_name[module_name_length + 1];
             module_value_length = configfile_trim_and_move(module_value);
 
