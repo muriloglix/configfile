@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include "libconfigfile.h"
 
@@ -42,90 +43,72 @@
 //#endif
 
 /**
- * Removes whitespace before and after string, frees the old string and allocates a new one via malloc(3) to store the new string.
- * <p>
- * First it tries to trim (through sscanf(3)) and allocate memory in a temporary variable, if everything works then it frees what is in *string, sets the new address allocated inside *string and returns the amount of bytes allocated.
- * <p>
- * If something fails during sscanf(3) it will return 0 (zero) and nothing will be changed in the string variable and errno will be set according to sscanf(3).
- * @param string Variable used to serve as source and destination. It must receive the address of the pointer to be modified.
- * @return Returns the number of bytes allocated to hold the new string. Return the size_t type.
+ * Rearranges the string and removes trailing whitespace.
+ * @param string String to be modified.
+ * @return If successful, it returns the number of bytes in the string, if not, it returns zero.
  */
-size_t configfile_trim(char **string) {
-    char *trimmed_string;
-    int errno_backup;
+size_t configfile_trim_and_move(char *string) {
+    size_t string_length, left_size, right_size;
 
-    if (string == NULL || *string == NULL) {
+    if (string == NULL) {
         return 0;
     }
 
-    trimmed_string = NULL;
+    string_length = strlen(string);
 
-    errno_backup = errno;
-    errno = 0;
-
-    if (sscanf(*string, "%ms", &trimmed_string) < 0) {
-        //        PRINTF_ERRNO_ERROR();
+    if (string_length == 0) {
         return 0;
     }
 
-    free(*string);
-    *string = trimmed_string;
-    errno = errno_backup;
+    left_size = 0;
+    right_size = 0;
 
-    return strlen(trimmed_string);
+    for (left_size = 0; !isalnum(string[left_size]) && left_size < string_length; left_size++);
+    if (left_size == string_length) {
+        return 0;
+    }
+
+    for (right_size = 0; !isalnum(string[string_length - (right_size + 1)]) && right_size < string_length; right_size++);
+
+    string_length = string_length - left_size - right_size;
+
+    if (left_size > 0) {
+        memmove(string, &string[left_size], string_length);
+        memset(&string[string_length + 1], ' ', left_size - 1);
+    }
+
+    string[string_length] = '\0';
+
+    return string_length;
 }
 
 /**
  * Allocates and populates a new structure of type configfile.
  * @param module_name Parameter name, cannot be NULL.
- * @param module_value Parameter value, can be NULL.
- * @return Returns a configfile structure allocated with malloc(3), on failure returns NULL and sets errno according to the problem.
+ * @param module_value Parameter value, cannot be NULL.
+ * @return Returns a configfile structure allocated with malloc(3), on failure returns NULL. errno is set according to malloc(3).
  */
 configfile *configfile_new(char *module_name, char *module_value) {
-    char *name, *value;
     size_t name_length, value_length;
     configfile *allocated_configfile;
 
-    if (module_name == NULL) {
+    if (module_name == NULL || module_value == NULL) {
         return NULL;
     }
 
-    name = module_name;
-    value = module_value;
-
-    name_length = configfile_trim(&name);
-
-    if (!name_length) {
-        return NULL;
-    }
-
-    if (value == NULL) {
-        value_length = 0;
-    } else {
-        value_length = strlen(value);
-    }
+    name_length = strlen(module_name);
+    value_length = strlen(module_value);
 
     allocated_configfile = malloc(sizeof (configfile));
 
     if (allocated_configfile == NULL) {
         //        PRINTF_ERRNO_ERROR();
-
-        free(name);
-        name = NULL;
-        name_length = 0;
-
-        if (value != NULL) {
-            free(value);
-            value = NULL;
-            value_length = 0;
-        }
-
         return NULL;
     }
 
-    allocated_configfile->module_name = name;
+    allocated_configfile->module_name = module_name;
     allocated_configfile->module_name_length = name_length;
-    allocated_configfile->module_value = value;
+    allocated_configfile->module_value = module_value;
     allocated_configfile->module_value_length = value_length;
     allocated_configfile->next = NULL;
 
@@ -167,7 +150,6 @@ void configfile_kill(configfile *config_struct_to_kill) {
             config_struct_to_kill->module_name_length = 0;
         }
         if (config_struct_to_kill->module_value != NULL) {
-            free(config_struct_to_kill->module_value);
             config_struct_to_kill->module_value = NULL;
             config_struct_to_kill->module_value_length = 0;
         }
@@ -182,9 +164,9 @@ void configfile_kill(configfile *config_struct_to_kill) {
  * @return Returns a structure containing modules and their values according to the configuration file defined in filename.
  */
 configfile *configfile_run(FILE *open_file) {
-    char *line_contents;
-    size_t n, line_number;
+    char *line_contents, *delimiter;
     char *module_name, *module_value;
+    size_t n, line_number, line_length, module_name_length, module_value_length;
     configfile *configfile_struct_return, *new_configfile, **configfile_struct_next;
     int errno_backup;
 
@@ -201,34 +183,57 @@ configfile *configfile_run(FILE *open_file) {
     errno = 0;
 
     while (getline(&line_contents, &n, open_file) > 0 && !errno) {
+        line_length = strlen(line_contents);
         line_number++;
 
-        module_name = NULL;
-        module_value = NULL;
+        module_name = line_contents;
+        delimiter = strchr(module_name, '=');
 
-        if (sscanf(line_contents, "%m[^=]=%ms", &module_name, &module_value) < 0) {
-            goto error_00;
-        }
+repeat_delimiter:
+        if (delimiter != NULL) {
+            delimiter[0] = '\0';
+            module_name_length = configfile_trim_and_move(module_name);
 
-        if (module_name == NULL) {
-            //            PRINTF_WARNING(": Ignoring malformed line(%ld): %s\n", line_number, line_contents);
-            continue;
-        }
+            if (!module_name_length) {
+                delimiter = NULL;
+                goto repeat_delimiter;
+            }
 
-        new_configfile = configfile_new(module_name, module_value);
+            module_value = &module_name[module_name_length + 1];
+            module_value_length = configfile_trim_and_move(module_value);
 
-        if (new_configfile == NULL) {
-            //            PRINTF_WARNING(": Ignoring malformed line(%ld): %s\n", line_number, line_contents);
-            continue;
-        }
+            if (!module_value_length) {
+                delimiter = NULL;
+                goto repeat_delimiter;
+            }
 
-        if (configfile_struct_return == NULL) {
-            configfile_struct_return = new_configfile;
+            if ((module_name_length + module_value_length + 2) != line_length) {
+                line_contents = realloc(line_contents, module_name_length + module_value_length + 2);
+                module_name = line_contents;
+                module_value = &module_name[module_name_length + 1];
+            }
+
+            new_configfile = configfile_new(module_name, module_value);
+
+            if (new_configfile == NULL) {
+                delimiter = NULL;
+                goto repeat_delimiter;
+            }
+
+            if (configfile_struct_return == NULL) {
+                configfile_struct_return = new_configfile;
+            } else {
+                *configfile_struct_next = new_configfile;
+            }
+
+            configfile_struct_next = &new_configfile->next;
         } else {
-            *configfile_struct_next = new_configfile;
+            free(line_contents);
         }
 
-        configfile_struct_next = &new_configfile->next;
+
+        line_contents = NULL;
+        n = 0;
     }
 
     module_name = NULL;
@@ -248,17 +253,7 @@ configfile *configfile_run(FILE *open_file) {
 
 error_00:
     configfile_kill(configfile_struct_return);
-    if (module_name != NULL) {
-        free(module_name);
-        module_name = NULL;
-    }
 
-    if (module_value != NULL) {
-        free(module_value);
-        module_value = NULL;
-    }
-
-    //    PRINTF_ERRNO_ERROR();
     if (line_contents != NULL) {
         free(line_contents);
         line_contents = NULL;
@@ -275,16 +270,12 @@ configfile *configfile_init(const char *filename) {
 
     open_file = fopen(filename, "r");
     if (open_file == NULL) {
-        //        PRINTF_ERRNO_ERROR();
         return NULL;
     }
 
     return_config_struct = configfile_run(open_file);
 
-    if (fclose(open_file)) {
-        //        PRINTF_ERRNO_ERROR();
-    }
-
+    fclose(open_file);
     open_file = NULL;
 
     return return_config_struct;
